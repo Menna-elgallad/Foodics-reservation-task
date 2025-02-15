@@ -1,9 +1,5 @@
 
-export interface Table {
-  id: string;
-  name: string;
-  accepts_reservations: boolean;
-}
+import type { Table } from "./tables";
 
 export interface Section {
   id: string;

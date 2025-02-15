@@ -1,9 +1,7 @@
-// src/api/branches.ts
+
 
 import { Branch, BranchUpdatePayload } from '../types/branches';
 import { API_TOKEN } from '@/config';
-
-
 
 
 const headers = {
@@ -18,11 +16,11 @@ export const fetchBranches = async (): Promise<Branch[]> => {
   });
   if (!response.ok) throw new Error('Failed to fetch branches');
   const data = await response.json();
-  return data.data;
+  return data.data
 };
 
 export const updateBranch = async (branchId: string, payload: BranchUpdatePayload): Promise<Branch> => {
-  const response = await fetch(`/branches/${branchId}`, {
+  const response = await fetch(`/api/branches/${branchId}`, {
     method: 'PUT',
     headers,
     body: JSON.stringify(payload),
@@ -30,4 +28,12 @@ export const updateBranch = async (branchId: string, payload: BranchUpdatePayloa
   if (!response.ok) throw new Error('Failed to update branch');
   const data = await response.json();
   return data.data;
+};
+
+export const ChangeReservationsForBranch = async (branchId: string , accepts_reservations :boolean ): Promise<void> => {
+  await fetch(`/api/branches/${branchId}`, {
+    method: 'PUT',
+    headers ,
+    body: JSON.stringify({ accepts_reservations }),
+  });
 };
