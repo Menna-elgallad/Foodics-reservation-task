@@ -3,7 +3,10 @@
     <div
       @click="toggleDropdown"
       tabindex="0"
-      :class="{ 'cursor-not-allowed opacity-50 focus:ring-transparent focus:border-transparent': disabled }"
+      :class="{
+        'cursor-not-allowed opacity-50 focus:ring-transparent focus:border-transparent':
+          disabled,
+      }"
       class="p-2 border bg-white transition rounded-lg cursor-pointer flex items-center justify-between w-full focus:ring-2 focus:ring-primary-light focus:border-primary"
     >
       <template v-if="selectedItems.length === 0">Select options</template>
@@ -65,7 +68,11 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-
+interface Option {
+  label: string;
+  value: string;
+  accepts_reservations?: boolean;
+}
 export default defineComponent({
   props: {
     options: {
@@ -95,7 +102,7 @@ export default defineComponent({
       get() {
         return this.value;
       },
-      set(newVal) {
+      set(newVal: Option[]) {
         this.$emit("input", newVal);
       },
     },
@@ -105,45 +112,26 @@ export default defineComponent({
       if (this.disabled) return;
       this.isOpen = !this.isOpen;
     },
-    toggleItem(item) {
+    toggleItem(item: Option) {
       if (this.selectedItems.includes(item)) {
         this.removeItem(item);
       } else {
         this.selectedItems = [...this.selectedItems, item];
       }
     },
-    removeItem(item) {
+    removeItem(item: Option) {
       this.selectedItems = this.selectedItems.filter((i) => i !== item);
-      
-
-    },
-    handleClickOutside(event) {
-      console.log(
-        this.$refs.dropdown && !this.$refs.dropdown.contains(event.target)
-      );
-
-      if (this.$refs.dropdown && !this.$refs.dropdown.contains(event.target)) {
-        this.isOpen = false;
-      }
     },
   },
   mounted() {
-  
     if (this.initialValue.length > 0) {
       this.selectedItems = this.initialValue;
     }
-
-    document.addEventListener("click", this.handleClickOutside);
-  },
-  beforeDestroy() {
-
-    document.removeEventListener("click", this.handleClickOutside);
   },
 });
 </script>
 
 <style scoped>
-
 .slide-enter-active,
 .slide-leave-active {
   transition: all 0.3s ease;
