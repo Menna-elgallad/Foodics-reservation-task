@@ -35,7 +35,7 @@
             class="mb-4"
           >
             <label class="text-start block text-sm font-medium mb-2">
-              {{ key }}
+              {{ key.charAt(0).toUpperCase() + key.slice(1) }}
               <button
                 v-if="key === 'saturday'"
                 type="button"
