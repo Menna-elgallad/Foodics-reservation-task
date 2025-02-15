@@ -12,7 +12,7 @@ const API_BASE = process.env.VUE_APP_API_BASE;
 
 
 export const changeTableReservation = async (tableId: string ,accepts_reservations:boolean ): Promise<Table> => {
-  const response = await fetch(`${API_BASE}/tables/${tableId}`, {
+  const response = await fetch(`/api/tables/${tableId}`, {
     method: 'PUT',
     headers,
     body: JSON.stringify({ accepts_reservations }),
