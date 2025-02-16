@@ -1,4 +1,4 @@
-# my-vue2-project
+# Foodics reservations task
 
 ## Project setup
 ```
