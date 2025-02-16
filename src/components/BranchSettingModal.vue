@@ -143,9 +143,9 @@ export default Vue.extend({
         Wednesday: [],
         Thursday: [],
         Friday: [],
-      } as ReservationTimes, 
+      } as ReservationTimes,
       reservation_duration: 0,
-      validationErrors: {} as { [key: string]: string }, 
+      validationErrors: {} as { [key: string]: string },
     };
   },
   watch: {
@@ -155,7 +155,7 @@ export default Vue.extend({
     isModalOpen(newVal) {
       this.$emit("input", newVal);
     },
-  
+
     branch(newVal) {
       const weekOrder = [
         "saturday",
@@ -193,19 +193,16 @@ export default Vue.extend({
     },
   },
   methods: {
-   
     addTimeSlot(day: string) {
       if (this.reservation_times[day].length < 3) {
         this.reservation_times[day].push(["00:00", "00:00"]);
       }
     },
 
-   
     removeTimeSlot(day: string, index: number) {
       this.reservation_times[day].splice(index, 1);
     },
-   
-   
+
     applyToAllDays() {
       const saturdayTimes = this.reservation_times["saturday"];
       if (saturdayTimes) {
@@ -224,37 +221,24 @@ export default Vue.extend({
       return hours * 60 + minutes;
     },
 
-   
     validateTimeSlot(timeSlot: string[]): boolean {
       const [start, end] = timeSlot;
-
-    
       if (start === end) {
         return false;
       }
-
-
       const startMinutes = this.timeToMinutes(start);
       const endMinutes = this.timeToMinutes(end);
-
-  
       const slotDuration =
         endMinutes > startMinutes
           ? endMinutes - startMinutes
           : 24 * 60 - startMinutes + endMinutes;
-
-      
       return slotDuration >= this.reservation_duration;
     },
-
-   
     validateDay(day: string): string | null {
       const times = this.reservation_times[day];
 
       for (let i = 0; i < times.length; i++) {
         const [start, end] = times[i];
-
-       
         if (start === end) {
           return `Slot ${
             i + 1
@@ -269,45 +253,41 @@ export default Vue.extend({
           } minutes).`;
         }
 
-     
         if (i > 0) {
           const prevEnd = this.timeToMinutes(times[i - 1][1]);
           const currentStart = this.timeToMinutes(times[i][0]);
 
-         
           if (currentStart === prevEnd) {
             return `Slot ${
               i + 1
             } cannot start at the same time as the previous slot's end.`;
           }
 
-       
           const prevStart = this.timeToMinutes(times[i - 1][0]);
           const currentEnd = this.timeToMinutes(times[i][1]);
 
           if (
-            (currentStart >= prevStart && currentStart < prevEnd) || 
-            (currentEnd > prevStart && currentEnd <= prevEnd) || 
-            (prevEnd <= prevStart && currentStart < prevEnd) || 
-            (currentEnd <= currentStart && currentEnd > prevStart) 
+            (currentStart >= prevStart && currentStart < prevEnd) ||
+            (currentEnd > prevStart && currentEnd <= prevEnd) ||
+            (prevEnd <= prevStart && currentStart < prevEnd) ||
+            (currentEnd <= currentStart && currentEnd > prevStart)
           ) {
             return `Slot ${i + 1} overlaps with the previous slot.`;
           }
         }
       }
 
-      return null; 
+      return null;
     },
-
 
     validateAllDays(): boolean {
       let isValid = true;
-      this.validationErrors = {}; 
+      this.validationErrors = {};
 
       Object.keys(this.reservation_times).forEach((day) => {
         const error = this.validateDay(day);
         if (error) {
-          this.validationErrors[day] = error; 
+          this.validationErrors[day] = error;
           isValid = false;
         }
       });
@@ -343,19 +323,26 @@ export default Vue.extend({
         this.isLoading = true;
         const updatedBranch = await updateBranch(this.branch.id, payload);
         const updatedTables = [
-        ...this.tablesEnabled.filter(
+          ...this.tablesEnabled
+            .filter(
               (tableItem) =>
                 !this.selectedTables
-                  .map((value ) => value.value)
+                  .map((value) => value.value)
                   .includes(tableItem.value)
-            ).map((tableItem) => ({...tableItem , accepts_reservations: false}))
-            , ...this.selectedTables.map((tableItem) => ({...tableItem , accepts_reservations: true}))
-          
+            )
+            .map((tableItem) => ({
+              ...tableItem,
+              accepts_reservations: false,
+            })),
+          ...this.selectedTables.map((tableItem) => ({
+            ...tableItem,
+            accepts_reservations: true,
+          })),
         ];
-     
+
         if (updatedTables.length > 0) {
           const updatedTablesRequests = updatedTables.map((table) =>
-            changeTableReservation(table.value , table.accepts_reservations)
+            changeTableReservation(table.value, table.accepts_reservations)
           );
 
           const results = await Promise.allSettled(updatedTablesRequests);
